@@ -1,0 +1,12 @@
+{
+  "Author": "Orchidee",
+  "Name": "Orchidee",
+  "InternalName": "Orchidee",
+  "Punchline": "Minimaler Orchestrion-001-Wiedergabetest.",
+  "Description": "Testet die lokale Orchestrion-Vorschau von Track-ID 1 ueber Play und Stop. Oeffnen mit /orchidee oder Dalamud Open.",
+  "AssemblyVersion": "0.1.0.0",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 15,
+  "TestingDalamudApiLevel": 15,
+  "Tags": ["Orchestrion", "Audio", "Test"]
+}

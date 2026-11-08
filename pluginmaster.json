@@ -1,0 +1,28 @@
+[
+  {
+    "Author": "Orchidee",
+    "Name": "Orchidee",
+    "Punchline": "Minimaler Orchestrion-001-Wiedergabetest.",
+    "Description": "Testet die lokale Orchestrion-Vorschau von Track-ID 1 ueber Play und Stop. Oeffnen mit /orchidee oder Dalamud Open.",
+    "InternalName": "Orchidee",
+    "Tags": [
+      "Orchestrion",
+      "Audio",
+      "Test"
+    ],
+    "RepoUrl": "https://github.com/NeoGriever/Orchidee",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 15,
+    "TestingDalamudApiLevel": 15,
+    "IsHide": "False",
+    "IsTestingExclusive": false,
+    "DownloadCount": 0,
+    "IconUrl": "https://raw.githubusercontent.com/NeoGriever/Orchidee/main/plugins/Orchidee/icon.png",
+    "DownloadLinkInstall": "https://github.com/NeoGriever/Orchidee/raw/main/plugins/Orchidee/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/NeoGriever/Orchidee/raw/main/plugins/Orchidee/latest.zip",
+    "AssemblyVersion": "0.1.0.0",
+    "TestingAssemblyVersion": "0.1.0.0",
+    "DownloadLinkTesting": "https://github.com/NeoGriever/Orchidee/raw/main/plugins/Orchidee/latest.zip",
+    "LastUpdate": 1794159270
+  }
+]
