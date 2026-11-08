@@ -12,8 +12,6 @@ public sealed class OrchestrionPlaybackService : IDisposable
     private bool startedByPlugin;
 
     public ushort? CurrentSampleId { get; private set; }
-    public string Status { get; private set; } = "Bereit.";
-
     public OrchestrionPlaybackService(IPluginLog log, IClientState clientState)
     {
         this.log = log;
@@ -24,7 +22,6 @@ public sealed class OrchestrionPlaybackService : IDisposable
     {
         if (!clientState.IsLoggedIn)
         {
-            Status = "Nicht eingeloggt.";
             return;
         }
         try
@@ -33,26 +30,23 @@ public sealed class OrchestrionPlaybackService : IDisposable
             OrchestrionManager.PlaySample(sampleId);
             CurrentSampleId = sampleId;
             startedByPlugin = true;
-            Status = $"PlaySample({sampleId}) aufgerufen.";
             log.Information("Orchidee: PlaySample({SampleId})", sampleId);
         }
         catch (Exception ex)
         {
             CurrentSampleId = null;
             startedByPlugin = false;
-            Status = "Wiedergabe fehlgeschlagen. Siehe Log.";
-            log.Error(ex, "Orchidee: PlaySample fehlgeschlagen.");
+            log.Error(ex, "Orchidee: Could not start preview.");
         }
     }
 
     public void Stop()
     {
-        if (!startedByPlugin) { Status = "Keine Vorschau von Orchidee aktiv."; return; }
+        if (!startedByPlugin) return;
         if (!clientState.IsLoggedIn)
         {
             CurrentSampleId = null;
             startedByPlugin = false;
-            Status = "Nicht eingeloggt.";
             return;
         }
         try
@@ -60,12 +54,10 @@ public sealed class OrchestrionPlaybackService : IDisposable
             OrchestrionManager.StopSample();
             startedByPlugin = false;
             CurrentSampleId = null;
-            Status = "Vorschau gestoppt.";
         }
         catch (Exception ex)
         {
-            Status = "Stop fehlgeschlagen. Siehe Log.";
-            log.Error(ex, "Orchidee: StopSample fehlgeschlagen.");
+            log.Error(ex, "Orchidee: Could not stop preview.");
         }
     }
 

@@ -33,7 +33,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.AddHandler(CommandName, new CommandInfo((_, _) => OpenWindow())
         {
-            HelpMessage = "Oeffnet den Orchidee-Orchestrion-Katalog."
+            HelpMessage = "Open the Orchidee Orchestrion catalog."
         });
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi += OpenWindow;

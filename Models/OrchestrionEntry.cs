@@ -1,6 +1,6 @@
 namespace Orchidee.Models;
 
-/// <summary>IDs aus EXD; PlaySample erwartet die Orchestrion-Row-ID, nicht die sichtbare Nummer.</summary>
+/// <summary>EXD IDs; PlaySample expects the Orchestrion row ID rather than its display number.</summary>
 public sealed record OrchestrionEntry(
     ushort SampleId,
     string Name,

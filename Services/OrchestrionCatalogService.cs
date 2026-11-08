@@ -16,10 +16,8 @@ public sealed class OrchestrionCatalogService
 {
     private readonly IDataManager data;
     private readonly IPluginLog log;
-    private readonly List<string> diagnostics = new();
     public IReadOnlyList<OrchestrionEntry> Entries { get; private set; } = Array.Empty<OrchestrionEntry>();
-    public IReadOnlyList<string> Diagnostics => diagnostics;
-    public string Status { get; private set; } = "Noch nicht geladen.";
+    public string Status { get; private set; } = "Catalog not loaded yet.";
 
     public OrchestrionCatalogService(IDataManager data, IPluginLog log)
     {
@@ -30,21 +28,13 @@ public sealed class OrchestrionCatalogService
 
     public void Reload()
     {
-        diagnostics.Clear();
         try
         {
             var songs = data.GetExcelSheet<Orchestrion>();
             var ui = data.GetExcelSheet<OrchestrionUiparam>();
             var categories = data.GetExcelSheet<OrchestrionCategory>();
             if (songs == null || ui == null || categories == null)
-                throw new InvalidOperationException("Eine der benoetigten Orchestrion-EXD-Tabellen fehlt.");
-
-            var sampleSong = songs.FirstOrDefault();
-            var sampleUi = ui.FirstOrDefault();
-            var sampleCategory = categories.FirstOrDefault();
-            diagnostics.Add("Orchestrion: " + Properties(sampleSong));
-            diagnostics.Add("OrchestrionUiparam: " + Properties(sampleUi));
-            diagnostics.Add("OrchestrionCategory: " + Properties(sampleCategory));
+                throw new InvalidOperationException("A required Orchestrion data sheet is missing.");
 
             // Map categories from game data. Named fields are discovered defensively because
             // Lumina column names can change with updated game schemas.
@@ -81,32 +71,24 @@ public sealed class OrchestrionCatalogService
                 if (!uiRows.TryGetValue(uiKey.Value, out var meta)) continue;
                 var categoryId = meta.Category ?? ReadUInt(song, "OrchestrionCategory", "Category");
                 var category = categoryId.HasValue && categoryNames.TryGetValue(categoryId.Value, out var text)
-                    ? text : "Nicht zugeordnet";
+                    ? text : "Uncategorized";
                 var number = meta.Number is > 0 ? meta.Number : null;
-                var isMapped = number.HasValue && category != "Nicht zugeordnet";
+                var isMapped = number.HasValue && category != "Uncategorized";
                 entries.Add(new OrchestrionEntry((ushort)id.Value, name, category, number, isMapped));
             }
 
             Entries = entries.OrderBy(e => e.Category).ThenBy(e => e.DisplayNumber ?? int.MaxValue)
                 .ThenBy(e => e.SampleId).ToArray();
-            var mapped = Entries.Count(x => x.IsMapped);
-            Status = $"{Entries.Count} Notenrollen aus EXD, {mapped} mit Kategorie und Nummer zugeordnet.";
-            diagnostics.Add($"Orchestrion-Rows: {songs.Count}; UI-Rows: {uiRows.Count}; Kategorien: {categoryNames.Count}");
-            diagnostics.Add(Status);
-            diagnostics.Add("Bekannter Referenzfall: SampleId 2 = Wailers And Waterwheels / Orte I 001.");
+            Status = $"{Entries.Count} orchestrion rolls loaded.";
             log.Information("Orchidee: {Status}", Status);
         }
         catch (Exception ex)
         {
             Entries = Array.Empty<OrchestrionEntry>();
-            Status = "Katalog konnte nicht geladen werden: " + ex.Message;
-            diagnostics.Add(ex.ToString());
-            log.Error(ex, "Orchidee: Fehler beim Laden des Notenrollen-Katalogs.");
+            Status = "Could not load the Orchestrion catalog.";
+            log.Error(ex, "Orchidee: Could not load the Orchestrion catalog.");
         }
     }
-
-    private static string Properties<T>(T value) => value is null ? "(leer)" :
-        string.Join(", ", value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(p => p.Name));
 
     private static uint? RowId(object row) => ReadUInt(row, "RowId");
 
