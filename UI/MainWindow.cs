@@ -71,9 +71,18 @@ public sealed class MainWindow : Window
     {
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(24, 22));
         ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 20);
+        var transparent = Vector4.Zero;
+        ImGui.PushStyleColor(ImGuiCol.ResizeGrip, transparent);
+        ImGui.PushStyleColor(ImGuiCol.ResizeGripHovered, transparent);
+        ImGui.PushStyleColor(ImGuiCol.ResizeGripActive, transparent);
     }
 
-    public override void PostDraw() => ImGui.PopStyleVar(2);
+    public override void PostDraw()
+    {
+        ImGui.PopStyleColor(3);
+        ImGui.PopStyleVar(3);
+    }
 
     public override void Draw()
     {
@@ -85,8 +94,7 @@ public sealed class MainWindow : Window
             draw.AddImage(wrap.Handle, start, start + size);
         else
             draw.AddRectFilled(start, start + size, Pack(.12f, .10f, .19f), 12);
-        // Keep the stroke wholly inside the window's clip rectangle.
-        draw.AddRect(start + new Vector2(2, 2), start + size - new Vector2(2, 2), Pack(.65f, .52f, .31f, .85f), 10, ImDrawFlags.None, 2);
+        // The rounded frame is part of the PNG so every edge scales with it.
 
         ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 8);
         ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 12);
