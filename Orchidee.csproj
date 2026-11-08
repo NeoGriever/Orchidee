@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>0.1.0.1</Version>
+    <Version>0.1.0.2</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Assets/**/*.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

@@ -18,6 +18,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] private static IPluginLog Log { get; set; } = null!;
     [PluginService] private static IClientState ClientState { get; set; } = null!;
     [PluginService] private static IDataManager DataManager { get; set; } = null!;
+    [PluginService] private static ITextureProvider TextureProvider { get; set; } = null!;
 
     private readonly WindowSystem windowSystem = new("Orchidee");
     private readonly MainWindow mainWindow;
@@ -27,7 +28,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         playback = new OrchestrionPlaybackService(Log, ClientState);
         var catalog = new OrchestrionCatalogService(DataManager, Log);
-        mainWindow = new MainWindow(playback, catalog);
+        mainWindow = new MainWindow(playback, catalog, new OrchideeAssets(TextureProvider));
         windowSystem.AddWindow(mainWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo((_, _) => OpenWindow())
@@ -37,7 +38,6 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi += OpenWindow;
         PluginInterface.UiBuilder.OpenConfigUi += OpenWindow;
-        // Kein automatisches Oeffnen beim Laden.
     }
 
     private void OpenWindow() => mainWindow.IsOpen = true;
