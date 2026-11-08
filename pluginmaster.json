@@ -20,9 +20,9 @@
     "IconUrl": "https://raw.githubusercontent.com/NeoGriever/Orchidee/main/plugins/Orchidee/icon.png",
     "DownloadLinkInstall": "https://github.com/NeoGriever/Orchidee/raw/main/plugins/Orchidee/latest.zip",
     "DownloadLinkUpdate": "https://github.com/NeoGriever/Orchidee/raw/main/plugins/Orchidee/latest.zip",
-    "AssemblyVersion": "0.1.0.2",
-    "TestingAssemblyVersion": "0.1.0.2",
+    "AssemblyVersion": "0.1.0.3",
+    "TestingAssemblyVersion": "0.1.0.3",
     "DownloadLinkTesting": "https://github.com/NeoGriever/Orchidee/raw/main/plugins/Orchidee/latest.zip",
-    "LastUpdate": 1794161447
+    "LastUpdate": 1794161856
   }
 ]

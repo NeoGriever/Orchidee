@@ -28,7 +28,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         playback = new OrchestrionPlaybackService(Log, ClientState);
         var catalog = new OrchestrionCatalogService(DataManager, Log);
-        mainWindow = new MainWindow(playback, catalog, new OrchideeAssets(TextureProvider));
+        mainWindow = new MainWindow(playback, catalog, new OrchideeAssets(TextureProvider, PluginInterface.AssemblyLocation.DirectoryName ?? AppContext.BaseDirectory));
         windowSystem.AddWindow(mainWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo((_, _) => OpenWindow())

@@ -14,10 +14,12 @@ public sealed class OrchideeAssets
     private readonly ITextureProvider textures;
     private readonly string root;
 
-    public OrchideeAssets(ITextureProvider textures)
+    public OrchideeAssets(ITextureProvider textures, string pluginDirectory)
     {
         this.textures = textures;
-        root = Path.Combine(Path.GetDirectoryName(typeof(OrchideeAssets).Assembly.Location)!, "Assets");
+        // Assembly.Location may be empty for plugins loaded via an AssemblyLoadContext.
+        // Dalamud's AssemblyLocation points to the actual plugin DLL directory.
+        root = Path.Combine(pluginDirectory, "Assets");
     }
 
     public ISharedImmediateTexture? Category(string key, string state) => Load("Categories", $"{key}_{state}.png");
