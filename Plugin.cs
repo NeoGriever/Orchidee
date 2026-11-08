@@ -17,6 +17,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] private static ICommandManager CommandManager { get; set; } = null!;
     [PluginService] private static IPluginLog Log { get; set; } = null!;
     [PluginService] private static IClientState ClientState { get; set; } = null!;
+    [PluginService] private static IDataManager DataManager { get; set; } = null!;
 
     private readonly WindowSystem windowSystem = new("Orchidee");
     private readonly MainWindow mainWindow;
@@ -25,23 +26,20 @@ public sealed class Plugin : IDalamudPlugin
     public Plugin()
     {
         playback = new OrchestrionPlaybackService(Log, ClientState);
-        mainWindow = new MainWindow(playback);
+        var catalog = new OrchestrionCatalogService(DataManager, Log);
+        mainWindow = new MainWindow(playback, catalog);
         windowSystem.AddWindow(mainWindow);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(CommandName, new CommandInfo((_, _) => OpenWindow())
         {
-            HelpMessage = "Oeffnet den Orchidee-Orchestrion-Test."
+            HelpMessage = "Oeffnet den Orchidee-Orchestrion-Katalog."
         });
-
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi += OpenWindow;
         PluginInterface.UiBuilder.OpenConfigUi += OpenWindow;
-
-        // Absichtlich kein OpenWindow() im Konstruktor.
-        Log.Information("Orchidee geladen. Fenster bleibt geschlossen bis /orchidee oder Dalamud Open.");
+        // Kein automatisches Oeffnen beim Laden.
     }
 
-    private void OnCommand(string command, string args) => OpenWindow();
     private void OpenWindow() => mainWindow.IsOpen = true;
 
     public void Dispose()

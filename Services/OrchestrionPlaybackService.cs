@@ -4,20 +4,15 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace Orchidee.Services;
 
-/// <summary>
-/// Minimaler Versuch mit der nativen Orchestrion-Sample-Funktion.
-/// Achtung: Die interne Sample-ID 1 wird hier bewusst als Test-Hypothese
-/// fuer die sichtbare Notenrollen-Nummer 001 verwendet. Die Abbildung
-/// muss anhand der Spiel-EXD-Daten separat verifiziert werden.
-/// </summary>
+/// <summary>Client-only native Orchestrion preview. Never invokes PlayTrack (network-facing).</summary>
 public sealed class OrchestrionPlaybackService : IDisposable
 {
-    private const ushort SampleId = 1;
     private readonly IPluginLog log;
     private readonly IClientState clientState;
     private bool startedByPlugin;
 
-    public string Status { get; private set; } = "Bereit (noch nicht getestet).";
+    public ushort? CurrentSampleId { get; private set; }
+    public string Status { get; private set; } = "Bereit.";
 
     public OrchestrionPlaybackService(IPluginLog log, IClientState clientState)
     {
@@ -25,55 +20,54 @@ public sealed class OrchestrionPlaybackService : IDisposable
         this.clientState = clientState;
     }
 
-    public void Play()
+    public void Play(ushort sampleId)
     {
         if (!clientState.IsLoggedIn)
         {
-            Status = "Nicht eingeloggt. Bitte im Spiel testen.";
+            Status = "Nicht eingeloggt.";
             return;
         }
-
         try
         {
-            // Spielclient-Funktion, keine serverseitige PlayTrack-Anforderung.
-            OrchestrionManager.PlaySample(SampleId);
+            if (startedByPlugin) OrchestrionManager.StopSample();
+            OrchestrionManager.PlaySample(sampleId);
+            CurrentSampleId = sampleId;
             startedByPlugin = true;
-            Status = "PlaySample(1) aufgerufen. Ob Ton erklingt, bitte im Spiel pruefen.";
-            log.Information("Orchidee: PlaySample(1) aufgerufen (sichtbare 001 noch nicht verifiziert).");
+            Status = $"PlaySample({sampleId}) aufgerufen.";
+            log.Information("Orchidee: PlaySample({SampleId})", sampleId);
         }
         catch (Exception ex)
         {
-            Status = "Play fehlgeschlagen. Siehe Dalamud-Log.";
-            log.Error(ex, "Orchidee: PlaySample(1) fehlgeschlagen.");
+            CurrentSampleId = null;
+            startedByPlugin = false;
+            Status = "Wiedergabe fehlgeschlagen. Siehe Log.";
+            log.Error(ex, "Orchidee: PlaySample fehlgeschlagen.");
         }
     }
 
     public void Stop()
     {
+        if (!startedByPlugin) { Status = "Keine Vorschau von Orchidee aktiv."; return; }
         if (!clientState.IsLoggedIn)
         {
-            Status = "Nicht eingeloggt. Stop nicht ausgefuehrt.";
+            CurrentSampleId = null;
+            startedByPlugin = false;
+            Status = "Nicht eingeloggt.";
             return;
         }
-
         try
         {
             OrchestrionManager.StopSample();
             startedByPlugin = false;
-            Status = "StopSample() aufgerufen.";
-            log.Information("Orchidee: StopSample() aufgerufen.");
+            CurrentSampleId = null;
+            Status = "Vorschau gestoppt.";
         }
         catch (Exception ex)
         {
-            Status = "Stop fehlgeschlagen. Siehe Dalamud-Log.";
-            log.Error(ex, "Orchidee: StopSample() fehlgeschlagen.");
+            Status = "Stop fehlgeschlagen. Siehe Log.";
+            log.Error(ex, "Orchidee: StopSample fehlgeschlagen.");
         }
     }
 
-    public void Dispose()
-    {
-        // Aufraeumen nur, wenn diese Plugininstanz ein Sample gestartet hat.
-        if (startedByPlugin && clientState.IsLoggedIn)
-            Stop();
-    }
+    public void Dispose() => Stop();
 }
